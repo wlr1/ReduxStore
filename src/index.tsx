@@ -6,10 +6,21 @@ import { Provider } from "react-redux";
 import { store } from "./redux/store";
 
 import App from "./App";
-import NotFound from "./Components/NotFound/NotFound";
-import Cart from "./Components/Cart/Cart";
 import Home from "./Components/Home/Home";
-import FullProduct from "./Components/FullProduct/FullProduct";
+
+const Cart = React.lazy(
+  () => import(/* webpackChunkName: "Cart" */ "./Components/Cart/Cart")
+);
+const FullProduct = React.lazy(
+  () =>
+    import(
+      /* webpackChunkName: "FullProduct" */ "./Components/FullProduct/FullProduct"
+    )
+);
+const NotFound = React.lazy(
+  () =>
+    import(/* webpackChunkName: "NotFound" */ "./Components/NotFound/NotFound")
+);
 
 const router = createBrowserRouter([
   {
@@ -22,25 +33,41 @@ const router = createBrowserRouter([
       },
       {
         path: "*",
-        element: <NotFound />,
+        element: (
+          <React.Suspense fallback={<div>Loading...</div>}>
+            <NotFound />
+          </React.Suspense>
+        ),
       },
       {
         path: "/cart",
-        element: <Cart />,
+        element: (
+          <React.Suspense fallback={<div>Loading...</div>}>
+            <Cart />
+          </React.Suspense>
+        ),
       },
       {
         path: "/pizza/:id",
-        element: <FullProduct />,
+        element: (
+          <React.Suspense fallback={<div>Loading...</div>}>
+            <FullProduct />
+          </React.Suspense>
+        ),
       },
     ],
   },
 ]);
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <RouterProvider router={router} />
-    </Provider>
-  </React.StrictMode>
-);
+const rootEl = document.getElementById("root");
+
+if (rootEl) {
+  const root = ReactDOM.createRoot(rootEl);
+  root.render(
+    <React.StrictMode>
+      <Provider store={store}>
+        <RouterProvider router={router} />
+      </Provider>
+    </React.StrictMode>
+  );
+}

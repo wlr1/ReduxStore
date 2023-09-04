@@ -1,25 +1,29 @@
-import Categories from "../Categories/Categories";
-import Sort, { list } from "../Sort/Sort";
-import ProductSkeleton from "../ProductSkeleton/ProductSkeleton";
-import Product from "../Product/Product";
-import Pagination from "../Pagination/Pagination";
+import Categories from '../Categories/Categories';
+import Sort, { list } from '../Sort/Sort';
+import ProductSkeleton from '../ProductSkeleton/ProductSkeleton';
+import Product from '../Product/Product';
+import Pagination from '../Pagination/Pagination';
 
-import React from "react";
-import qs from "qs";
+import React from 'react';
+import qs from 'qs';
 
-import { useNavigate } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+
+import { useAppDispatch } from '../../redux/store';
+import { selectFilter } from '../../redux/Slices/filter/selectors';
 import {
   setCategoryId,
-  setPageCount,
   setFilters,
-  selectFilter,
-} from "../../redux/Slices/filterSlice";
-import { fetchPizzas, selectPizzaData } from "../../redux/Slices/pizzasSlice";
+  setPageCount,
+} from '../../redux/Slices/filter/slice';
+import { selectPizzaData } from '../../redux/Slices/pizza/selectors';
+import { fetchPizzas } from '../../redux/Slices/pizza/asyncActions';
+import { SearchPizzaParams } from '../../redux/Slices/pizza/types';
 
-const Home = (props) => {
+const Home: React.FC = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const isSearch = React.useRef(false);
   const isMounted = React.useRef(false);
 
@@ -29,19 +33,19 @@ const Home = (props) => {
 
   const sortType = sort.sortProperty;
 
-  const onClickCategory = (id) => {
+  const onClickCategory = (id: number) => {
     dispatch(setCategoryId(id));
   };
 
-  const onChangePage = (number) => {
+  const onChangePage = React.useCallback((number: number) => {
     dispatch(setPageCount(number));
-  };
+  }, []);
 
   const getPizzas = async () => {
-    const order = sortType.includes("-") ? "asc" : "desc";
-    const sortBy = sortType.replace("-", "");
-    const category = categoryId > 0 ? `category=${categoryId}` : "";
-    const search = searchValue ? `search=${searchValue}` : "";
+    const order = sortType.includes('-') ? 'asc' : 'desc';
+    const sortBy = sortType.replace('-', '');
+    const category = categoryId > 0 ? `category=${categoryId}` : '';
+    const search = searchValue ? `search=${searchValue}` : '';
 
     dispatch(
       fetchPizzas({
@@ -49,7 +53,7 @@ const Home = (props) => {
         sortBy,
         category,
         search,
-        pageCount,
+        pageCount: String(pageCount),
       })
     );
   };
@@ -71,14 +75,18 @@ const Home = (props) => {
   //if there was first render, then we check fir url-params and save in redux
   React.useEffect(() => {
     if (window.location.search) {
-      const params = qs.parse(window.location.search.substring(1));
+      const params = qs.parse(
+        window.location.search.substring(1)
+      ) as unknown as SearchPizzaParams;
 
-      const sort = list.find((obj) => obj.sortProperty === params.sortProperty);
+      const sort = list.find((obj) => obj.sortProperty === params.sortBy);
 
       dispatch(
         setFilters({
-          ...params,
-          sort,
+          searchValue: params.search,
+          categoryId: Number(params.category),
+          pageCount: Number(params.pageCount),
+          sort: sort || list[0],
         })
       );
       isSearch.current = true;
@@ -97,7 +105,7 @@ const Home = (props) => {
     isSearch.current = false;
   }, [categoryId, sortType, searchValue, pageCount]);
 
-  const pizzas = items.map((obj) => <Product key={obj.id} {...obj} />);
+  const pizzas = items.map((obj: any) => <Product key={obj.id} {...obj} />);
 
   const skeleton = [...new Array(6)].map((_, i) => <ProductSkeleton key={i} />);
 
@@ -107,15 +115,17 @@ const Home = (props) => {
         <Categories value={categoryId} onClickCategory={onClickCategory} />
         <Sort />
       </div>
-      <h2 className="content__title">Все пиццы</h2>
-      {status === "error" ? (
+      <h2 className="content__title">All pizzas</h2>
+      {status === 'error' ? (
         <div className="content__error-info">
-          <h2>Something goes wrong! 😕</h2>
+          <h2>
+            Something goes wrong! <span>😕</span>
+          </h2>
           <p>Can't access to pizzas database. Try again later!</p>
         </div>
       ) : (
         <div className="content__items">
-          {status === "loading" ? skeleton : pizzas}
+          {status === 'loading' ? skeleton : pizzas}
         </div>
       )}
 

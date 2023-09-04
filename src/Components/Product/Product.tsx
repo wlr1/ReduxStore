@@ -1,12 +1,29 @@
-import React from "react";
+import React from 'react';
 
-import { useSelector, useDispatch } from "react-redux";
-import { addItem, selectCartItem } from "../../redux/Slices/cartSlice";
-import { Link } from "react-router-dom";
+import { useSelector, useDispatch } from 'react-redux';
+import { addItem } from '../../redux/Slices/cart/slice';
+import { Link } from 'react-router-dom';
+import { selectCartItem } from '../../redux/Slices/cart/selectors';
+import { CartItem } from '../../redux/Slices/cart/types';
 
-const typeName = ["Тонкое", "Традиционное"];
+const typeName: string[] = ['Thin', 'Traditional'];
+type ProductProps = {
+  id: string;
+  price: number;
+  types: number[];
+  sizes: number[];
+  imageUrl: string;
+  title: string;
+};
 
-const Product = ({ id, price, types, sizes, imageUrl, title }) => {
+const Product: React.FC<ProductProps> = ({
+  id,
+  price,
+  types,
+  sizes,
+  imageUrl,
+  title,
+}) => {
   const dispatch = useDispatch();
   const cartItem = useSelector(selectCartItem(id));
   const [activeType, setActiveType] = React.useState(0);
@@ -15,13 +32,14 @@ const Product = ({ id, price, types, sizes, imageUrl, title }) => {
   const addedCount = cartItem ? cartItem.count : 0;
 
   const onClickAdd = () => {
-    const item = {
+    const item: CartItem = {
       id,
       title,
       price,
       imageUrl,
       type: typeName[activeType],
       sizes: sizes[activeSize],
+      count: 0,
     };
     dispatch(addItem(item));
   };
@@ -31,7 +49,7 @@ const Product = ({ id, price, types, sizes, imageUrl, title }) => {
       <li
         key={i}
         onClick={() => setActiveType(i)}
-        className={activeType === i ? "active" : ""}
+        className={activeType === i ? 'active' : ''}
       >
         {typeName[type]}
       </li>
@@ -42,10 +60,10 @@ const Product = ({ id, price, types, sizes, imageUrl, title }) => {
     return (
       <li
         onClick={() => setActiveSize(i)}
-        className={activeSize === i ? "active" : ""}
+        className={activeSize === i ? 'active' : ''}
         key={i}
       >
-        {size} см.
+        {size} cm.
       </li>
     );
   });
@@ -62,7 +80,7 @@ const Product = ({ id, price, types, sizes, imageUrl, title }) => {
           <ul>{sizeActive}</ul>
         </div>
         <div className="pizza-block__bottom">
-          <div className="pizza-block__price">{price} ₽</div>
+          <div className="pizza-block__price">{price} EUR</div>
           <div
             onClick={onClickAdd}
             className="button button--outline button--add"
@@ -79,7 +97,7 @@ const Product = ({ id, price, types, sizes, imageUrl, title }) => {
                 fill="white"
               />
             </svg>
-            <span>Добавить</span>
+            <span>Add</span>
             {addedCount > 0 && <i>{addedCount}</i>}
           </div>
         </div>

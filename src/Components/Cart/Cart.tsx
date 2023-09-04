@@ -1,18 +1,22 @@
-import React from "react";
+import React from 'react';
 
-import { Link } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import CartItem from "./CartItem/CartItem";
-import { clearItems, selectCart } from "../../redux/Slices/cartSlice";
-import CartEmpty from "../CartEmpty/CartEmpty";
+import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import CartItem from './CartItem/CartItem';
+import { clearItems } from '../../redux/Slices/cart/slice';
+import CartEmpty from '../CartEmpty/CartEmpty';
+import { selectCart } from '../../redux/Slices/cart/selectors';
 
-function Cart(props) {
+const Cart: React.FC = () => {
   const dispatch = useDispatch();
   const { totalPrice, items } = useSelector(selectCart);
-  const totalCount = items.reduce((sum, item) => sum + item.count, 0);
+  const totalCount = items.reduce(
+    (sum: number, item: any) => sum + item.count,
+    0
+  );
 
   const onClickClear = () => {
-    if (window.confirm("Are you sure you want to clear a cart?")) {
+    if (window.confirm('Are you sure you want to clear a cart?')) {
       dispatch(clearItems());
     }
   };
@@ -54,7 +58,7 @@ function Cart(props) {
                 strokeLinejoin="round"
               ></path>
             </svg>
-            Корзина
+            Cart
           </h2>
           <div onClick={onClickClear} className="cart__clear">
             <svg
@@ -94,23 +98,23 @@ function Cart(props) {
               ></path>
             </svg>
 
-            <span>Очистить корзину</span>
+            <span>Empty trash</span>
           </div>
         </div>
         <div className="content__items">
-          {items.map((item) => (
+          {items.map((item: any) => (
             <CartItem key={item.id} {...item} />
           ))}
         </div>
         <div className="cart__bottom">
           <div className="cart__bottom-details">
             <span>
-              {" "}
-              Всего пицц: <b>{totalCount} шт.</b>{" "}
+              {' '}
+              Total pizzas: <b>{totalCount} p.</b>{' '}
             </span>
             <span>
-              {" "}
-              Сумма заказа: <b>{totalPrice} ₽</b>{" "}
+              {' '}
+              Order price: <b>{totalPrice} EUR</b>{' '}
             </span>
           </div>
           <div className="cart__bottom-buttons">
@@ -134,16 +138,16 @@ function Cart(props) {
                 ></path>
               </svg>
 
-              <span>Вернуться назад</span>
+              <span>Go back</span>
             </Link>
             <div className="button pay-btn">
-              <span>Оплатить сейчас</span>
+              <span>Pay now</span>
             </div>
           </div>
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default Cart;

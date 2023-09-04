@@ -4,8 +4,14 @@ import styles from "./FullProduct.module.scss";
 
 import { useParams } from "react-router-dom";
 
-const FullProduct = (props) => {
-  const [data, setData] = React.useState();
+interface ProductData {
+  imageUrl: string;
+  title: string;
+  price: number;
+}
+
+const FullProduct: React.FC = () => {
+  const [data, setData] = React.useState<ProductData | undefined>();
   const { id } = useParams();
 
   React.useEffect(() => {
@@ -21,10 +27,11 @@ const FullProduct = (props) => {
     }
 
     fetchPizza();
-  }, []);
+    fetchPizza();
+  }, [id]);
 
   if (!data) {
-    return "loading...";
+    return <div>"loading..."</div>;
   }
   return (
     <div className={styles.container}>

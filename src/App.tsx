@@ -4,7 +4,7 @@ import "./scss/app.scss";
 import Header from "./Components/Header/Header";
 import { Outlet } from "react-router-dom";
 
-function App(props) {
+const App: React.FC = () => {
   return (
     <div className="wrapper">
       <Header />
@@ -13,6 +13,6 @@ function App(props) {
       </div>
     </div>
   );
-}
+};
 
 export default App;
